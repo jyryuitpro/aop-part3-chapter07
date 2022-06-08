@@ -1,15 +1,16 @@
 package io.jyryuitpro.aop.part3.chapter07
 
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
 import com.naver.maps.map.overlay.Marker
+import com.naver.maps.map.overlay.Overlay
 import com.naver.maps.map.util.FusedLocationSource
 import com.naver.maps.map.util.MarkerIcons
 import com.naver.maps.map.widget.LocationButtonView
@@ -19,7 +20,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, Overlay.OnClickListener {
     private lateinit var naverMap: NaverMap
 
     private lateinit var locationSource: FusedLocationSource
@@ -55,6 +56,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         recyclerView.adapter = recyclerAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+
+                val selectedHouseModel = viewPagerAdapter.currentList[position]
+                val cameraUpdate =
+                    CameraUpdate.scrollTo(LatLng(selectedHouseModel.lat, selectedHouseModel.lng))
+                        .animate(CameraAnimation.Easing)
+
+                naverMap.moveCamera(cameraUpdate)
+            }
+        })
     }
 
     override fun onMapReady(map: NaverMap) {
@@ -119,6 +133,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 val marker = Marker()
                 marker.position = LatLng(house.lat, house.lng)
                 // todo 마커 클릭 리스너
+//                marker.onClickListener = this
                 marker.map = naverMap
                 marker.tag = house.id
                 marker.icon = MarkerIcons.BLACK
@@ -183,5 +198,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
+    }
+
+    override fun onClick(overlay: Overlay): Boolean {
+        val selectedModel = viewPagerAdapter.currentList.firstOrNull {
+            it.id == overlay.tag
+        }
+
+        selectedModel?.let {
+            val postion = viewPagerAdapter.currentList.indexOf(it)
+            viewPager.currentItem = postion
+        }
+
+        return true
     }
 }
