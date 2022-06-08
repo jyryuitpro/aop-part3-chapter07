@@ -4,8 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/top_radius_background.xml" value="0.331" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.19113573407202217" />
         <entry key="app/src/main/res/layout/bottom_sheet.xml" value="0.28425925925925927" />
+        <entry key="app/src/main/res/layout/item_house_detail_for_viewpager.xml" value="0.38753799392097266" />
       </map>
     </option>
   </component>
